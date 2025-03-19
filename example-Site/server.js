@@ -1,9 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
 const app = express();
+
+app.use(express.json()); // 🚨 REQUIRED to parse JSON requests
+app.use(express.urlencoded({ extended: true })); // ✅ Handles URL-encoded bodies
+
 app.use(cookieParser());
+app.use(express.static("public"));
 
 //VULNERABLE CORS POLICY
 app.use(cors({
@@ -11,7 +15,7 @@ app.use(cors({
         console.log("Received request from origin:", origin || "No Origin (Direct Access)");
 
         if (!origin) {
-            // Direct browser visits (e.g., manually entering URL) will have no Origin
+            // Direct browser visits
             return callback(null, true); 
         }
 
@@ -25,31 +29,30 @@ app.use(cors({
     credentials: true
 }));
 
-// Simulated user session (insecure example)
 app.use((req, res, next) => {
-    if (!req.cookies.auth) {
-        res.cookie("auth", "user-session-token", { httpOnly: true, domain: "victim.com", SameSite: "None", secure: false });
-    }
+    console.log("🔹 Incoming Request:", req.method, req.url);
+    console.log("🔹 Body:", req.body);
+    console.log("🔹 Cookies:", req.cookies);
     next();
 });
 
-app.get("/", (req, res) => {
-    res.send("<h1>Welcome to Victim Site</h1><p>This is a vulnerable site.</p>");
-});
-// Vulnerable endpoint exposing sensitive data
-app.get("/sensitive-data", (req, res) => {
-    if (req.cookies.auth) {
-        return res.json({ secret: "Credentials: user12345" });
-    }
-    res.status(403).json({ error: "Unauthorized" });
+app.post("/set-secret", (req, res) => {
+    const secret = req.body.secret;
+    if (!secret) return res.status(400).json({ error: "No secret provided" });
+
+    res.cookie("secret", secret, { httpOnly: false, domain: "localhost", SameSite: "None", secure: false });
+    res.json({ message: "Secret stored!" });
 });
 
-// Home page
-app.get("/sensitive-data", (req, res) => {
-    if (req.cookies.auth) {
-        return res.json({ secret: "User password: 123456" });
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+// Vulnerable endpoint exposing sensitive data
+app.get("/get-secret", (req, res) => {
+    if (req.cookies.secret) {
+        return res.json({ secret: req.cookies.secret });
     }
-    res.status(403).json({ error: "Unauthorized" });
+    res.status(403).json({ error: "No secret found" });
 });
 
 app.listen(3000, () => console.log("Victim site running on http://localhost:3000"));

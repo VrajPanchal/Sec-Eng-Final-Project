@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Subdomain of Victim</title>
+    <title>Subdomain of Example site</title>
 </head>
 <body>
-    <h1>Subdomain: sub.victim.com</h1>
+    <h1>Subdomain of Example site</h1>
     <button onclick="RequestData()">Click to Proceed</button>
     <p id="output"></p>
     <script>
         function RequestData() {
-            fetch("http://localhost:3000/sensitive-data", {
+            fetch("http://localhost:3000/get-secret", {
                 method: "GET",
                 credentials: "include"  // Ensures cookies are sent
             })
             .then(response => response.json())
             .then(data => {
-                document.body.innerHTML += `<p>Accessed Secret Data: ${data.secret}</p>`;
+                document.getElementById("output").innerHTML = `<p>${data.secret}</p>`;
             })
             .catch(error => console.error("Failed to fetch data:", error));
         }
