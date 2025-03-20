@@ -3,8 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const app = express();
 
-app.use(express.json()); // 🚨 REQUIRED to parse JSON requests
-app.use(express.urlencoded({ extended: true })); // ✅ Handles URL-encoded bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 app.use(express.static("public"));
@@ -12,7 +12,7 @@ app.use(express.static("public"));
 //VULNERABLE CORS POLICY
 app.use(cors({
     origin: (origin, callback) => {
-        console.log("Received request from origin:", origin || "No Origin (Direct Access)");
+        console.log("Received request from origin:", origin || "No Origin");
 
         if (!origin) {
             // Direct browser visits
@@ -41,7 +41,7 @@ app.post("/set-secret", (req, res) => {
     if (!secret) return res.status(400).json({ error: "No secret provided" });
 
     res.cookie("secret", secret, { httpOnly: false, domain: "localhost", SameSite: "None", secure: false });
-    res.json({ message: "Secret stored!" });
+    res.json({ message: "Secret stored successfully" });
 });
 
 app.get("/", (req, res) => {
